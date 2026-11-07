@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Budget Planner</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#2a78d6" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Budget" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232a78d6'/><text x='16' y='23' font-size='19' text-anchor='middle' fill='white' font-family='system-ui' font-weight='700'>₹</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script>
+    try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="confetti" aria-hidden="true">
+    <span class="c c-circle"></span>
+    <span class="c c-tri"></span>
+    <svg class="c c-squiggle" viewBox="0 0 120 24" fill="none"><path d="M2 12c10-12 20-12 30 0s20 12 30 0 20-12 30 0 20 12 26 0" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
+    <span class="c c-square"></span>
+    <span class="c c-ring"></span>
+    <span class="c c-dots"></span>
+    <span class="c c-pill"></span>
+    <span class="c c-tri2"></span>
+  </div>
+  <header class="topbar">
+    <a class="brand" href="#dashboard">
+      <span class="brand-mark" aria-hidden="true">₹</span>
+      <span>
+        <span class="brand-name">Budget Planner</span>
+        <span class="brand-sub" id="save-state" role="status" aria-live="polite">Loading…</span>
+      </span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#dashboard" data-tab="dashboard">Dashboard</a>
+      <a href="#plan" data-tab="plan">Plan</a>
+      <a href="#calendar" data-tab="calendar">Calendar</a>
+      <a href="#table" data-tab="table">Table</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="theme-toggle" type="button"></button>
+      <div class="menu">
+        <button class="icon-btn" id="menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="More actions" title="More">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        </button>
+        <div class="menu-list" id="menu-list" hidden>
+          <button type="button" data-action="export">Export backup (.json)</button>
+          <button type="button" data-action="import">Import backup…</button>
+          <button type="button" data-action="sample">Load example plan</button>
+          <hr />
+          <button type="button" data-action="reset" class="danger">Clear everything</button>
+        </div>
+        <input type="file" id="import-file" accept="application/json" hidden />
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- shown until the first load finishes; turns into an offline message if the server can't be reached -->
+    <section id="boot" class="boot" aria-live="polite">
+      <div class="boot-loading" aria-label="Loading your plan">
+        <div class="sk sk-title"></div>
+        <div class="sk-row"><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div><div class="sk sk-card"></div></div>
+        <div class="sk-row two"><div class="sk sk-chart"></div><div class="sk sk-chart"></div></div>
+      </div>
+      <div class="card boot-error">
+        <span class="hico pink" data-icon="alert"></span>
+        <h2>Can’t reach the planner</h2>
+        <p class="muted">The local server isn’t answering. Start it again in a terminal, then retry — your data is safe in <code>data/budget.db</code>.</p>
+        <pre><code>cd ~/budget &amp;&amp; npm start</code></pre>
+        <button class="btn primary" type="button" data-action="reload">Retry <span class="btn-ico" data-icon="arrowRight" data-size="14"></span></button>
+      </div>
+    </section>
+    <!-- ================= DASHBOARD ================= -->
+    <section id="tab-dashboard" class="tab-panel" hidden>
+      <div id="empty-state" class="hero" hidden>
+        <div class="hero-text">
+          <span class="eyebrow">Your money planner</span>
+          <h1>Let’s map out <span class="hl">your money</span>, month by month.</h1>
+          <p>Tell the planner your in-hand salary, monthly expenses, EMIs and what you’re saving for. It shows you where every rupee goes and exactly when each goal is reached.</p>
+          <div class="empty-actions">
+            <a class="btn primary" href="#plan">Start my plan <span class="btn-ico" data-icon="arrowRight" data-size="14"></span></a>
+            <button class="btn" type="button" data-action="sample">Try an example</button>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <span class="art-sun"></span>
+          <span class="art-dots"></span>
+          <div class="art-card a1"><span class="hico violet" data-icon="piggy"></span><b>Emergency fund</b><span class="bar striped"><span style="width:72%;background:#8b5cf6"></span></span></div>
+          <div class="art-card a2"><span class="hico pink" data-icon="target"></span><b>New PC</b><small>Reached Aug ’27</small></div>
+          <div class="art-card a3"><span class="hico mint" data-icon="trend"></span><b>+30% raise</b></div>
+          <span class="art-tri"></span>
+        </div>
+      </div>
+
+      <div id="dash" hidden>
+        <div class="dash-head">
+          <div>
+            <h1>Your money, month by month</h1>
+            <p class="muted" id="dash-sub"></p>
+          </div>
+          <div class="head-actions">
+            <a class="btn primary" id="dash-month-link" href="#calendar">Open this month</a>
+            <div class="seg" id="horizon-seg" role="group" aria-label="Projection length">
+              <button type="button" data-h="12">1 yr</button><button type="button" data-h="24">2 yrs</button><button type="button" data-h="36">3 yrs</button><button type="button" data-h="60">5 yrs</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpis" id="kpis"></div>
+        <div id="alerts"></div>
+
+        <div class="grid-2">
+          <article class="card chart-card">
+            <header>
+              <h2><span class="hico violet" data-icon="piggy"></span>Where your savings sit</h2>
+              <p class="muted">Goals stacked · free savings as a line · click any month to open it</p>
+            </header>
+            <div class="chart-wrap"><canvas id="chart-balances" aria-label="Stacked area chart of fund balances over time. The Table tab has the same numbers." role="img"></canvas></div>
+          </article>
+          <article class="card chart-card">
+            <header>
+              <h2><span class="hico pink" data-icon="wallet"></span>Where each month’s pay goes</h2>
+              <p class="muted">Expenses, EMIs, goals and what’s left over · click a bar to open that month</p>
+            </header>
+            <div class="chart-wrap"><canvas id="chart-flow" aria-label="Stacked bar chart of monthly cash flow. The Table tab has the same numbers." role="img"></canvas></div>
+          </article>
+        </div>
+
+        <div class="section-head"><h2><span class="hico mint" data-icon="target"></span>Goals &amp; funds</h2><a class="link-btn" href="#plan" data-focus="goals">Edit goals →</a></div>
+        <div class="goal-grid" id="goal-cards"></div>
+
+        <div class="section-head"><h2><span class="hico yellow" data-icon="flag"></span>What happens when</h2><a class="link-btn" href="#calendar">Open calendar →</a></div>
+        <article class="card timeline-card"><ol class="timeline" id="timeline"></ol></article>
+      </div>
+    </section>
+
+    <!-- ================= PLAN ================= -->
+    <section id="tab-plan" class="tab-panel" hidden>
+      <div class="plan-layout">
+        <div class="plan-main">
+          <article class="card plan-card" id="sec-income">
+            <header><h2><span class="hico violet" data-icon="wallet"></span>Income &amp; starting point</h2><p class="muted">Your take-home pay after tax and deductions.</p></header>
+            <div class="fields fields-4" id="settings-fields"></div>
+          </article>
+
+          <article class="card plan-card" id="sec-raises">
+            <header><h2><span class="hico mint" data-icon="trend"></span>Appraisals &amp; raises</h2><p class="muted">Salary changes from the month you choose. Percentages stack on top of each other.</p></header>
+            <div class="rows" data-list="raises"></div>
+            <button class="btn add" type="button" data-add="raises">+ Add appraisal</button>
+          </article>
+
+          <article class="card plan-card" id="sec-bonuses">
+            <header><h2><span class="hico yellow" data-icon="gift"></span>Extra income</h2><p class="muted">Bonuses and other lump sums you expect — once or every year — and which fund they go into. Unplanned extras can also be added from any month in the Calendar.</p></header>
+            <div class="rows" data-list="bonuses"></div>
+            <button class="btn add" type="button" data-add="bonuses">+ Add extra income</button>
+          </article>
+
+          <article class="card plan-card" id="sec-expenses">
+            <header><h2><span class="hico pink" data-icon="receipt"></span>Regular expenses</h2><p class="muted">Costs that repeat every month. Leave “From” and “Until” empty if they never change. One-off spends are added on their month’s page in the Calendar. <span id="exp-total"></span></p></header>
+            <div class="rows" data-list="expenses"></div>
+            <button class="btn add" type="button" data-add="expenses">+ Add regular expense</button>
+            <a class="btn add" href="#calendar">+ Add a one-off (pick a month)</a>
+          </article>
+
+          <article class="card plan-card" id="sec-loans">
+            <header><h2><span class="hico violet" data-icon="landmark"></span>Loans &amp; EMIs</h2><p class="muted">Enter the EMI, or the loan amount and interest rate to calculate it. When a loan ends, choose where that money goes.</p></header>
+            <div class="rows" data-list="loans"></div>
+            <button class="btn add" type="button" data-add="loans">+ Add loan / EMI</button>
+          </article>
+
+          <article class="card plan-card" id="sec-goals">
+            <header><h2><span class="hico mint" data-icon="piggy"></span>Savings goals &amp; funds</h2><p class="muted">Only a name is required. Set a monthly amount to save automatically, or leave it empty and add money month by month from the Calendar. Leave the target empty for open-ended funds.</p></header>
+            <div class="rows" data-list="goals"></div>
+            <button class="btn add" type="button" data-add="goals">+ Add goal</button>
+          </article>
+        </div>
+
+        <aside class="plan-side">
+          <nav class="card plan-nav" id="plan-nav" aria-label="Plan sections"></nav>
+          <div class="card summary" id="plan-summary"></div>
+          <p class="side-foot">Changes save automatically to the database on this computer.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================= CALENDAR ================= -->
+    <section id="tab-calendar" class="tab-panel" hidden></section>
+    <section id="tab-month" class="tab-panel" hidden></section>
+
+    <!-- ================= TABLE ================= -->
+    <section id="tab-table" class="tab-panel" hidden>
+      <div class="dash-head">
+        <div><h1>Month by month</h1><p class="muted">Click a row for the breakdown, or open the month to edit it.</p></div>
+      </div>
+      <div class="card table-card">
+        <div class="table-scroll">
+          <table class="months-table" id="months-table"></table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/vendor/chart.js"></script>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
