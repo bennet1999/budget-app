@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Budget Planner</title>
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#2a78d6" />
@@ -40,10 +40,10 @@
       </span>
     </a>
     <nav class="tabs" aria-label="Sections">
-      <a href="#dashboard" data-tab="dashboard">Dashboard</a>
-      <a href="#plan" data-tab="plan">Plan</a>
-      <a href="#calendar" data-tab="calendar">Calendar</a>
-      <a href="#table" data-tab="table">Table</a>
+      <a href="#dashboard" data-tab="dashboard"><span class="tab-ico" data-icon="trend" data-size="20"></span>Dashboard</a>
+      <a href="#plan" data-tab="plan"><span class="tab-ico" data-icon="wallet" data-size="20"></span>Plan</a>
+      <a href="#calendar" data-tab="calendar"><span class="tab-ico" data-icon="calendar" data-size="20"></span>Calendar</a>
+      <a href="#table" data-tab="table"><span class="tab-ico" data-icon="receipt" data-size="20"></span>Table</a>
     </nav>
     <div class="top-actions">
       <button class="icon-btn" id="theme-toggle" type="button"></button>
@@ -64,7 +64,7 @@
   </header>
 
   <main id="main">
-    <!-- shown until the first load finishes; turns into an offline message if the server can't be reached -->
+    <!-- shown until the first load finishes; turns into an error message if the on-device data can't be read -->
     <section id="boot" class="boot" aria-live="polite">
       <div class="boot-loading" aria-label="Loading your plan">
         <div class="sk sk-title"></div>
@@ -73,9 +73,8 @@
       </div>
       <div class="card boot-error">
         <span class="hico pink" data-icon="alert"></span>
-        <h2>Can’t reach the planner</h2>
-        <p class="muted">The local server isn’t answering. Start it again in a terminal, then retry — your data is safe in <code>data/budget.db</code>.</p>
-        <pre><code>cd ~/budget &amp;&amp; npm start</code></pre>
+        <h2>Can’t load your plan</h2>
+        <p class="muted">Something went wrong reading the data stored on this device. Try again; if it keeps happening, reload the app or restore from an exported backup.</p>
         <button class="btn primary" type="button" data-action="reload">Retry <span class="btn-ico" data-icon="arrowRight" data-size="14"></span></button>
       </div>
     </section>
@@ -187,7 +186,7 @@
         <aside class="plan-side">
           <nav class="card plan-nav" id="plan-nav" aria-label="Plan sections"></nav>
           <div class="card summary" id="plan-summary"></div>
-          <p class="side-foot">Changes save automatically to the database on this computer.</p>
+          <p class="side-foot">Changes save automatically on this device. Use ⋯ → Export backup to keep a copy.</p>
         </aside>
       </div>
     </section>
@@ -201,6 +200,7 @@
       <div class="dash-head">
         <div><h1>Month by month</h1><p class="muted">Click a row for the breakdown, or open the month to edit it.</p></div>
       </div>
+      <p class="muted swipe-hint">Swipe the table sideways to see every column →</p>
       <div class="card table-card">
         <div class="table-scroll">
           <table class="months-table" id="months-table"></table>
