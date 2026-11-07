@@ -960,7 +960,7 @@ function init() {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) resync(); });
   load();
   requestPersistence();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
 init();
